@@ -1,2 +1,3 @@
-# My-Ponytown-Extension
-Adds a bunch of functionality to Ponytown where I can
+I'm new so don't hate !!
+
+This is just a personal project
