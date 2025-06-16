@@ -14,10 +14,6 @@
       party: "#89f6c7",
   };
 
-  function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
   function log(type, ...messages){
     if (debugSettings.mode.Enabled === true) {
       if (debugSettings[type] !== null && debugSettings[type].Enabled === true) {
@@ -32,8 +28,8 @@
       this.recordedName = "";
       this.currentChatType = 0; // general: 0, whisper: 1, party: 2
       this.threadManager = new ThreadModule.ThreadManager(this);
-      this.processedMessages = new WeakSet();
-      this.messageQueue = [];
+      //this.processedMessages = new WeakSet();
+      //this.messageQueue = [];
       this.maxSize = 100;
       this.lastProcessedIndex = 0;
       this.currentActiveTab = "";
@@ -77,10 +73,10 @@
         if (nameInput && nameInput.value !== this.recordedName) {
           this.recordedName = nameInput.value;
           this.resetProcessing();
-        }
+        };
       });
 
-      const observeName = () => {
+      function observeName() {
         const container = document.querySelector(".home-content");
         //log(container)
         if (container) {
@@ -105,7 +101,7 @@
           subtree: true
         });
         this.observers.push(fallbackObserver);
-      }
+      };
     };
 
     detectPlay() {
@@ -146,7 +142,7 @@
     setupTabObserver() {
       const tabs = document.querySelectorAll(".chat-log-tabs a");
       if (!tabs.length){
-        consoleError("Failed to Retrieve Tabs!");
+        log(debugSettings.observer.Name, "Failed to Retrieve Tabs!");
         return;
       };
       const tabObserver = new MutationObserver(mutations => {
@@ -178,7 +174,7 @@
     setupContainerObserver() {
       const container = document.querySelector(".chat-log-scroll-inner");
       if (!container) {
-        consoleError("Failed to retrieve container!");
+        log(debugSettings.observer.Name, "Failed to retrieve container!");
         return;
       };
       const containerObserver = new MutationObserver(mutations => {
@@ -224,7 +220,6 @@
                 //log(charName.getAttribute("title"));
                 if (charName && charName.getAttribute("title") !== selectedCharacter) {
                   selectedCharacter = charName.getAttribute("title");
-                  //log(`ts char: ${selectedCharacter}`)
                 };
               };
             });
@@ -314,11 +309,7 @@
         characterData: true
       });
       this.observers.push(chatBoxTypeObserver);
-
-
-
-
-
+      
       
       const chatBox = document.querySelector("chat-box");
 
@@ -372,7 +363,7 @@
             }
             else {                                  // closed
               chatLog.setAttribute("style", `${chatLog.getAttribute("style").split(";")[0]};`);
-            }
+            };
           };
         });
       });
@@ -381,76 +372,6 @@
         attributeFilter: ["hidden"]
       });
       this.observers.push(chatBoxDivObserver);
-
-      /*
-      //log(textArea);
-      //log("- 3")
-      let prevRowAmount = 1;
-      let scrollHeight = 0;
-      let offsetHeight = 0;
-      let prevHeight = 0;
-      textArea.addEventListener("input", (e) => {
-        if (offsetHeight === 0) {
-          offsetHeight = e.target.offsetHeight;
-        };
-        if (scrollHeight === 0) {
-          scrollHeight = e.target.scrollHeight;
-          prevHeight = scrollHeight;
-        };
-        const perRowOffset = 16;
-        const rowAmount = Math.round(
-          (e.target.scrollHeight - perRowOffset) / (e.target.offsetHeight - perRowOffset)
-        );
-        log("___")
-        log("ts stuff1: ", e.target.scrollHeight - perRowOffset);
-        log("ts stuff2: ", e.target.offsetHeight - perRowOffset);
-        log("prev: ", prevRowAmount);
-        log("row: ", rowAmount);
-        if (prevRowAmount !== rowAmount) {
-          prevRowAmount = rowAmount;
-          log("height changed!");
-          const newSize = (e.target.offsetHeight - perRowOffset) * rowAmount;
-          log("newsize: ", newSize)
-          offsetHeight = newSize;
-
-          //log(chatLog.getAttribute("style").split("bottom")[0]);
-          chatLog.setAttribute("style", 
-            `
-            ${chatLog.getAttribute("style").split("bottom")[0]}
-            bottom: ${newSize}px !important;
-            `
-          );
-          chatBoxDiv.setAttribute("style", 
-            `
-            bottom: 0;
-            height: ${newSize}px !important;
-            left: 0;
-            margin-top: -5px;
-            max-width: 500px;
-            padding-right: 5px;
-            padding-top: 5px;
-            position: absolute;
-            right: 0;
-            `
-          );
-          chatTypeDiv.setAttribute("style", 
-            `
-            --party-color: #97d8ff;
-            --whisper-color: #ffa1df;
-            height: ${newSize}px !important;
-            `
-          );
-          textAreaDiv.setAttribute("style", 
-            `
-            background: rgba(0, 0, 0, 0.65);
-            max-height: none !important;  
-            height: ${newSize}px !important;
-            `
-          );
-        
-        }; 
-      });
-      */
     };
 
     setupObsevers() {
@@ -460,7 +381,7 @@
       this.setupChatboxObserver();
     };
 
-    // Handle tab changes
+    
     handleTabChange() {
       this.resetProcessing();
       if (this.currentActiveTab === "Party") this.removeWhispers();
@@ -468,14 +389,14 @@
       else this.threadManager.channelSwitched();
     };
 
-    // Reset processing state
+    
     resetProcessing() {
-      this.processedMessages = new WeakSet();
-      this.messageQueue = [];
+      //this.processedMessages = new WeakSet();
+      //this.messageQueue = [];
       this.lastProcessedIndex = 0;
     };
 
-    // Debounce message processing
+    
     debounceProcessMessages() {
       //log(`debounce: %c${this.debounceTimer}`, "color: blue");
       clearTimeout(this.debounceTimer);
@@ -485,7 +406,7 @@
       }, 100);
     };
 
-    // Get unprocessed messages
+    
     getMessages() {
       const allMessages = document.querySelectorAll("#chat-log .chat-log-scroll-inner > .chat-line");
       const allMessagesLength = allMessages.length;
@@ -502,7 +423,7 @@
       return returnMessages;
     };
 
-    // Main message processing
+    
     processMessages() {
       const messages = this.getMessages();
       //log(messages);
@@ -510,44 +431,31 @@
       //log("%cRUNNING FUNCTION", "color: pink");
       log(debugSettings.chatLog.Name, `Returned Length: %c${messages.length}`, "color: blue");
       if (messages.length <= 0) return;
-      //log("%cPASSED", "color: pink");
-      //log(messages)
       messages.forEach((message, index) => {
-        //log(this.processedMessages);
-        //log(message);
-        //log(index);
-        /*
-        if (this.processedMessages.has(message)) {
-          log("%cur fucked mate", "color: yellow");
-          return;
-        };
-        */
-
         this.processMessage(message);
       });
     };
 
-    // Process individual message
+    
     processMessage(message) {
-      //log("_____________")
-      //log("hi message")
       //if (this.processedMessages.has(message)) return;
       message.classList.add("enhanced-processed");
-      this.processedMessages.add(message);
-      this.messageQueue.push(message);
+      //this.processedMessages.add(message);
+      //this.messageQueue.push(message);
 
       log(debugSettings.chatLog.Name, "%cFROM: processMessage()", "color: red");
       
-      if (this.messageQueue.length > this.maxSize) {
-        const oldestMessage = this.messageQueue.shift();
-        this.processedMessages.delete(oldestMessage);
-      };
+      // if (this.messageQueue.length > this.maxSize) {
+      //   const oldestMessage = this.messageQueue.shift();
+      //   this.processedMessages.delete(oldestMessage);
+      // };
       //log(this.processedMessages)
 
-      //log("ts message")
       log(debugSettings.chatLog.Name, message);
+
       const isSelfMessage = this.isSelfMessage(message);
       log(debugSettings.chatLog.Name, `is self message: ${isSelfMessage}`)
+
       if (isSelfMessage) this.applyColor(message);
       
     };
@@ -572,7 +480,6 @@
       
     };
 
-    // Check if message belongs to current user
     isSelfMessage(message) {
       const nameSpan = message.querySelector(".chat-line-name");
       if (!nameSpan) return false;
@@ -604,11 +511,7 @@
     processThreads() {
       /*
         TODO:
-          make sure ts works when a new message is received. It should NOT debounceProcessMessages
-          because the sender of the whisper might not be thread owner. Make a function in THreads.js 
-          that will process these messages instead
-
-          Also add notifications!
+          Add notifications!
       */
 
       // log(debugSettings.mode.Name, "processing threads");
@@ -628,7 +531,6 @@
     };
 
     removeWhispers() {
-      //await sleep(250) // wait a half of a second
       const whispers = document.querySelectorAll(".chat-line-whisper");
       //log(whispers)
       
