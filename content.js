@@ -76,7 +76,7 @@
         };
       });
 
-      function observeName() {
+      const observeName = () => {
         const container = document.querySelector(".home-content");
         //log(container)
         if (container) {
@@ -86,15 +86,13 @@
           });
           this.observers.push(nameObserver);
           return true;
-        }
+        };
         return false;
       };
 
       if (!observeName()) {
         const fallbackObserver = new MutationObserver(() => {
-          if (observeName()) {
-            fallbackObserver.disconnect();
-          };
+          if (observeName()) fallbackObserver.disconnect();
         });
         fallbackObserver.observe(document.body, {
           childList: true,
